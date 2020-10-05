@@ -1,0 +1,9 @@
+ls [1,1,130,1]
+pass
+pass
+pass
+ls [2,1,130,1]
+pass
+reap 1
+reap 2
+exit

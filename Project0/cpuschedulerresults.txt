@@ -1,0 +1,240 @@
+Beginning tests
+
+Test  0: Scheduler Init (All lists malloced and initialized)
+# Testing Initializing the List.
+# Initialize the Schedule	scheduler_init();
+| [10.00/10.00] Properly Initialized Scheduler
+
+Test  1: Scheduler Inserting one Process (on empty list)
+# Testing Inserting on Empty List.
+|Before (Ready):
+|	None
+# Inserting Process A	scheduler_add(s,a);
+|After (Ready):
+|	PID:   1 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command:  A 
+| Process flags are [ R    ]  (Expecting [ R    ])
+| [10.00/10.00] Process Inserted
+
+Test  2: Scheduler Inserting one Process (at front of list)
+# Testing Inserting on Non-Empty List (Insert in Front)
+|Before (Ready):
+|	None
+# Inserting Process A	scheduler_add(s,a);
+|After First Insert (Ready):
+|	PID:   1 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command:  A 
+# Inserting Process B	scheduler_add(s,b);
+|After (Ready):
+|	PID:   2 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command: sudo B 
+|	PID:   1 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command:  A 
+| Process flags are [ R    ]  (Expecting [ R    ])
+| Process flags are [ R   S]  (Expecting [ R   S])
+| [10.00/10.00] Process Inserted Properly
+
+Test  3: Scheduler Inserting one Process (at end of list)
+# Testing Inserting on Non-Empty List (Insert in Front)
+|Before (Ready):
+|	None
+# Inserting Process B	scheduler_add(s,b);
+|After First Insert (Ready):
+|	PID:   2 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command: sudo B 
+# Inserting Process A	scheduler_add(s,a);
+|After (Ready):
+|	PID:   1 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|	PID:   2 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command: sudo B 
+| Process flags are [ R    ]  (Expecting [ R    ])
+| Process flags are [ R   S]  (Expecting [ R   S])
+| [10.00/10.00] Process Inserted Properly
+
+Test  4: Scheduler Inserting a Defunct Process
+# Testing Inserting to Defunct List (Insert on Empty)
+|Before (Ready):
+|	None
+|Before (Defunct):
+|	None
+# Inserting Process B	scheduler_add(s,b);
+|After First Insert (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command: sudo B 
+# Inserting Finished Process A	scheduler_add(s,a);
+|After (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command: sudo B 
+|After (Defunct):
+|	PID:   1 Time Remaining:  0 Base Pri: 100 (Cur Pri: 100) Command:  A 
+| Process flags are [   Z  ]  (Expecting [   Z  ])
+| Process flags are [ R   S]  (Expecting [ R   S])
+| [10.00/10.00] Process Inserted Properly
+
+Test  5: Testing Select on an empty Ready Queue
+# Testing Select on Empty Queue.
+|Before (Ready):
+|	None
+# Selecting on an Empty Queue	scheduler_select(s);
+|After (Ready):
+|	None
+| [10.00/10.00] Select Returned NULL Properly
+
+Test  6: Testing Select on a Ready Queue with One Ready Process
+# Testing Select on Queue with One Ready Process
+|Before (Ready):
+|	PID:   1 Time Remaining: 10 Base Pri: 100 (Cur Pri: 100) Command:  A 
+# Selecting Process A	scheduler_select(s);
+|After (Ready):
+|	None
+| [10.00/10.00] Select Returned the Process Properly
+
+Test  7: Testing Select on a Ready Queue with Two Ready Processes (First Selected)
+# Testing Select on Queue with Two Ready Process (Selects First)
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  B 
+# Selecting Process A	scheduler_select(s);
+|After (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 130 (Cur Pri: 129) Command:  B 
+| [10.00/10.00] Select Returned the Process Properly
+
+Test  8: Testing Select on a Ready Queue with Two Ready Processes (Second Selected)
+# Testing Select on Queue with Two Ready Process (Selects Second)
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+# Selecting Process B	scheduler_select(s);
+|After (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 130 (Cur Pri: 129) Command:  A 
+| [10.00/10.00] Select Returned the Process Properly
+
+Test  9: Testing Select on a Ready Queue with Three Ready Processes (Middle Selected)
+# Testing Select on Queue with Three Ready Process (Selects Middle)
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+|	PID:   3 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  C 
+# Selecting Process B	scheduler_select(s);
+|After (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 130 (Cur Pri: 129) Command:  A 
+|	PID:   3 Time Remaining:  1 Base Pri: 130 (Cur Pri: 129) Command:  C 
+| [10.00/10.00] Select Returned the Process Properly
+
+Test 10: Testing Select on a Ready Queue with Three Ready Processes with Tie (First Selected)
+# Testing Select on Queue with Three Ready Process with Tie (Selects First)
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+|	PID:   3 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  C 
+# Selecting Process A	scheduler_select(s);
+|After (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 99) Command:  B 
+|	PID:   3 Time Remaining:  1 Base Pri: 130 (Cur Pri: 129) Command:  C 
+| [10.00/10.00] Select Returned the Process Properly
+
+Test 11: Testing Select on a Ready Queue with Three Ready Processes with Aging
+# Testing Select on Queue with Three Ready Process with Aging (Selects Last)
+# Aging Process C to base_priority = 130, cur_priority = 99
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+|	PID:   3 Time Remaining:  1 Base Pri: 130 (Cur Pri: 99) Command:  C 
+# Selecting Process C	scheduler_select(s);
+|After (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 100 (Cur Pri: 99) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 99) Command:  B 
+| [10.00/10.00] Select Returned the Process Properly
+
+Test 12: Testing Select on a Ready Queue with Three Ready Processes to test Aging
+# Testing Select on Queue with Three Ready Process with Aging (Tests aging)
+|Before (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|	PID:   2 Time Remaining:  1 Base Pri: 110 (Cur Pri: 110) Command:  B 
+|	PID:   3 Time Remaining:  1 Base Pri: 120 (Cur Pri: 120) Command:  C 
+# Selecting Process A	scheduler_select(s);
+# Selecting Process B	scheduler_select(s);
+# Selecting Process C	scheduler_select(s);
+# Selecting Process (Empty Queue)	scheduler_select(s);
+| [10.00/10.00] Select Returned the Process Properly
+
+Test 13: Testing Stop on a Process (Checking moving lists)
+# Testing Stopping a Process
+|Before (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+|	PID:   1 Time Remaining:  3 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|Before (Stopped):
+|	None
+# Stopping Process B	scheduler_stop(s,2);
+|After (Ready):
+|	PID:   1 Time Remaining:  3 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|After (Stopped):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+| Process flags are [ R    ]  (Expecting [ R    ])
+| Process flags are [  T   ]  (Expecting [  T   ])
+| [10.00/10.00] Process Stopped and Moved Properly
+
+Test 14: Testing Continue on a Process (Checking moving lists)
+# Testing Continuing a Process
+|Before (Ready):
+|	PID:   1 Time Remaining:  3 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|Before (Stopped):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+# Continuing Process B	scheduler_continue(s,2);
+|After (Ready):
+|	PID:   2 Time Remaining:  1 Base Pri: 100 (Cur Pri: 100) Command:  B 
+|	PID:   1 Time Remaining:  3 Base Pri: 100 (Cur Pri: 100) Command:  A 
+|After (Stopped):
+|	None
+| Process flags are [ R    ]  (Expecting [ R    ])
+| Process flags are [ R    ]  (Expecting [ R    ])
+| [10.00/10.00] Process Continued and Moved Properly
+
+Test 15: Testing Reap on a Process (Checking moving lists)
+# Testing Reaping a Process
+|Before (Ready):
+|	None
+|Before (Defunct):
+|	PID:   1 Time Remaining:  0 Base Pri: 100 (Cur Pri: 100) Command:  A 
+# Reaping Process A	scheduler_reap(s,1);
+|After (Ready):
+|	None
+|After (Defunct):
+|	None
+| [10.00/10.00] Process Reaped Properly
+
+Test 16: Testing Generation of a Process (Checking basic Generation)
+# Testing Generating a Process
+|Before (Ready):
+|	None
+# Generating Process A	scheduler_generate("A",1,130,1,0);
+|After (Ready):
+|	PID:   1 Time Remaining:  1 Base Pri: 130 (Cur Pri: 130) Command:  A 
+| Process flags are [ R    ]  (Expecting [ R    ])
+| [10.00/10.00] Process Generated Properly
+
+Test 17: Testing Generation of a Superuser Process (Checking Generation with Sudo)
+# Testing Generating a Superuser Process
+|Before (Ready):
+|	None
+# Generating Process A	scheduler_generate("A",2,100,5,1);
+|After (Ready):
+|	PID:   2 Time Remaining:  5 Base Pri: 100 (Cur Pri: 100) Command: sudo A 
+| Process flags are [ R   S]  (Expecting [ R   S])
+| [10.00/10.00] Process Generated Properly
+
+Test 18: Testing Count on a Sequence of Operations
+# Testing Counts on List Actions
+|Before (Ready):
+|	None
+# Counting Ready List
+# Inserting Process A to the Ready List
+# Inserting Process B to the Ready List
+# Selecting Process from the Ready List
+# Selecting Process from the Ready List
+# Adding Process to the Defunct List
+# Adding Process to the Defunct List
+# Reaping both Processes in the Defunct List
+# Adding Process and Stopping it.
+# Continuing Process in the Stopped List.
+| [10.00/10.00] Queue Counts Recorded Properly
+
+Test 19: Testing Valgrind for Heap Leaks
+==31343== All heap blocks were freed -- no leaks are possible
+| [10.00/10.00] Leaks Check Complete
+--------------------------
+Automated Testing Results:
+*(Score Scaled by 0.40 to be in range [0.0,80.0])
+Score: [80.00/80.00] 
